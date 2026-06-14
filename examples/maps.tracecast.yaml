@@ -1,6 +1,7 @@
-# Drives a real web app (OpenStreetMap): search a place, watch the map fly there.
-# Shows browser automation against a live site, with an assertion that doubles
-# as a smoke test. Requires network access.
+# A real workflow on a real site: tour world landmarks on OpenStreetMap.
+# Each stop searches a place, lets the map fly there, asserts the result
+# resolved (smoke test), and captures a screenshot artifact.
+# Requires network access.
 name: maps-demo
 
 permissions:
@@ -15,8 +16,8 @@ recording:
     visible: true
     clickEmphasis: true
   pacing:
-    actionDelayMs: 900
-    typeDelayMs: 85
+    actionDelayMs: 800
+    typeDelayMs: 75
   output:
     format: gif
 
@@ -27,25 +28,51 @@ steps:
   - wait:
       seconds: 2
 
-  # `>> visible=true` disambiguates the desktop search box from the hidden mobile one.
+  # --- Stop 1: Paris ---
+  # `>> visible=true` picks the desktop search box over the hidden mobile one.
   - browser:
       type:
         selector: "#query >> visible=true"
         text: "Eiffel Tower, Paris"
-
-  - wait:
-      seconds: 1
-
   - browser:
       click: ".search_form button[type=submit] >> visible=true"
-
   - wait:
       seconds: 4
-
-  # The search must actually resolve — fail the run if it doesn't.
   - assert:
       text: "Eiffel Tower"
-      label: search-resolved
+      label: paris
+  - screenshot:
+      label: paris
+
+  # --- Stop 2: Rome ---
+  - browser:
+      type:
+        selector: "#query >> visible=true"
+        text: "Colosseum, Rome"
+  - browser:
+      click: ".search_form button[type=submit] >> visible=true"
+  - wait:
+      seconds: 4
+  - assert:
+      text: "Roma"
+      label: rome
+  - screenshot:
+      label: rome
+
+  # --- Stop 3: Sydney ---
+  - browser:
+      type:
+        selector: "#query >> visible=true"
+        text: "Sydney Opera House"
+  - browser:
+      click: ".search_form button[type=submit] >> visible=true"
+  - wait:
+      seconds: 4
+  - assert:
+      text: "Sydney"
+      label: sydney
+  - screenshot:
+      label: sydney
 
   - wait:
       seconds: 2

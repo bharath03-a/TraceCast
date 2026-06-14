@@ -14,7 +14,7 @@ is `gif`/`mp4` and ffmpeg is installed) a composed file under `composed/`.
 
 | Example | What it shows | Permissions | Notes |
 |---------|---------------|-------------|-------|
-| `maps.tracecast.yaml` | Drives a real site (OpenStreetMap): search a place, map flies there, assert result | browser, network | The README hero demo; needs internet |
+| `maps.tracecast.yaml` | Drives a real site (OpenStreetMap): tours world landmarks (Paris → Rome → Sydney), asserts + screenshots each stop | browser, network | The README hero demo; needs internet |
 | `hello.tracecast.yaml` | Terminal + browser basics: echo, type, click, assert, wait | terminal, browser, network | Self-contained; uses `demo-target.html` |
 | `tracecast-meta.tracecast.yaml` | TraceCast recording itself — validates + runs hello, opens the summary viewer | terminal, browser | Produces the README GIF |
 | `git-log-demo.tracecast.yaml` | Terminal-only output rendered into the recording | terminal, browser | Run inside a git repo |

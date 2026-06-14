@@ -11,7 +11,7 @@ Regenerates in CI. Coding assistants can write and repair them.
 
 ![TraceCast demo](docs/demo.gif)
 
-<sub>Above: [`examples/maps.tracecast.yaml`](examples/maps.tracecast.yaml) — search a place on OpenStreetMap, recorded straight from YAML.</sub>
+<sub>Above: [`examples/maps.tracecast.yaml`](examples/maps.tracecast.yaml) — a world-landmark tour on OpenStreetMap (Paris → Rome → Sydney), each stop asserted and screenshotted, recorded straight from YAML.</sub>
 
 </div>
 
