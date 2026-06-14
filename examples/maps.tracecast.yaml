@@ -1,0 +1,51 @@
+# Drives a real web app (OpenStreetMap): search a place, watch the map fly there.
+# Shows browser automation against a live site, with an assertion that doubles
+# as a smoke test. Requires network access.
+name: maps-demo
+
+permissions:
+  browser: allow
+  network: allow
+
+recording:
+  viewport:
+    width: 1280
+    height: 720
+  cursor:
+    visible: true
+    clickEmphasis: true
+  pacing:
+    actionDelayMs: 900
+    typeDelayMs: 85
+  output:
+    format: gif
+
+steps:
+  - browser:
+      open: "https://www.openstreetmap.org/"
+
+  - wait:
+      seconds: 2
+
+  # `>> visible=true` disambiguates the desktop search box from the hidden mobile one.
+  - browser:
+      type:
+        selector: "#query >> visible=true"
+        text: "Eiffel Tower, Paris"
+
+  - wait:
+      seconds: 1
+
+  - browser:
+      click: ".search_form button[type=submit] >> visible=true"
+
+  - wait:
+      seconds: 4
+
+  # The search must actually resolve — fail the run if it doesn't.
+  - assert:
+      text: "Eiffel Tower"
+      label: search-resolved
+
+  - wait:
+      seconds: 2

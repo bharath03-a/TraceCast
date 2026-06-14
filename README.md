@@ -11,6 +11,8 @@ Regenerates in CI. Coding assistants can write and repair them.
 
 ![TraceCast demo](docs/demo.gif)
 
+<sub>Above: [`examples/maps.tracecast.yaml`](examples/maps.tracecast.yaml) — search a place on OpenStreetMap, recorded straight from YAML.</sub>
+
 </div>
 
 > Think **VHS, but for whole workflows** — terminal *and* browser in one script — and
@@ -151,8 +153,9 @@ Director can't do anything the script didn't grant.
 
 ## Examples & ecosystem
 
-- [`examples/`](examples/) — `hello`, `tracecast-meta`, `git-log-demo`, `api-demo`, plus
-  `summary-viewer.html`. See [examples/README.md](examples/README.md).
+- [`examples/`](examples/) — `maps` (the demo above), `hello`, `tracecast-meta`,
+  `git-log-demo`, `api-demo`, plus `summary-viewer.html`. See
+  [examples/README.md](examples/README.md).
 - [`record-action/`](record-action/) — a GitHub Action to run scripts in CI and upload
   recordings.
 
