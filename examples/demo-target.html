@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraceCast Demo Target</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #172033;
+        background: #f7f9fc;
+      }
+
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 64px 24px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 40px;
+      }
+
+      p {
+        line-height: 1.6;
+      }
+
+      .panel {
+        margin-top: 28px;
+        padding: 24px;
+        border: 1px solid #d9e1ec;
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+      }
+
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #b8c3d3;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+
+      button {
+        margin-top: 16px;
+        padding: 12px 16px;
+        border: 0;
+        border-radius: 6px;
+        color: #ffffff;
+        background: #2563eb;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      #result {
+        margin-top: 18px;
+        min-height: 28px;
+        font-weight: 700;
+        color: #166534;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>TraceCast demo target</h1>
+      <p>A small local page used by the example workflow.</p>
+
+      <section class="panel">
+        <label for="demo-name">Demo name</label>
+        <input id="demo-name" placeholder="Enter a demo name" />
+        <button id="run-demo" type="button">Run demo</button>
+        <div id="result" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script>
+      document.getElementById("run-demo").addEventListener("click", () => {
+        const name = document.getElementById("demo-name").value || "demo";
+        document.getElementById("result").textContent = `${name} workflow recorded.`;
+      });
+    </script>
+  </body>
+</html>

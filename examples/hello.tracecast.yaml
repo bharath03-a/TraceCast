@@ -1,0 +1,46 @@
+name: hello-tracecast
+
+permissions:
+  terminal: allow
+  browser: allow
+  network: allow
+
+recording:
+  viewport:
+    width: 1280
+    height: 720
+  cursor:
+    visible: true
+    clickEmphasis: true
+  pacing:
+    actionDelayMs: 700
+    clickDelayMs: 350
+    typeDelayMs: 90
+  output:
+    format: gif
+    titleCard: "TraceCast — demo-as-code"
+    endCard: "github.com/bharath03-a/TraceCast"
+
+steps:
+  - terminal:
+      run: echo "Starting TraceCast demo"
+
+  - browser:
+      open: demo-target.html
+
+  - browser:
+      type:
+        selector: "#demo-name"
+        text: "TraceCast"
+
+  - browser:
+      click: "#run-demo"
+
+  # Assertions turn a demo into a smoke test: if the result never shows, the run fails.
+  - assert:
+      selector: "#result"
+      contains: "workflow recorded"
+      label: result-rendered
+
+  - wait:
+      seconds: 2

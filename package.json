@@ -1,0 +1,56 @@
+{
+  "name": "tracecast",
+  "version": "0.1.0",
+  "description": "Demo-as-code runtime for reproducible software recordings.",
+  "type": "module",
+  "bin": {
+    "tracecast": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "prompts/",
+    "examples/",
+    "mcp-config.json",
+    "README.md",
+    "AGENTS.md"
+  ],
+  "keywords": [
+    "demo",
+    "demo-as-code",
+    "recording",
+    "screencast",
+    "playwright",
+    "yaml",
+    "mcp",
+    "ai",
+    "coding-assistant",
+    "automation"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsup src/cli.ts --format esm --dts --clean",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "commander": "^12.1.0",
+    "playwright": "^1.48.2",
+    "yaml": "^2.6.0",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

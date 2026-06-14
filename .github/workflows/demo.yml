@@ -1,0 +1,45 @@
+name: Record Demo
+
+# Regenerates the demo recording so it never goes stale. Runs on changes to the
+# runtime or examples, and on demand. Uploads the run directory (GIF + artifacts).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "examples/**"
+
+jobs:
+  record:
+    name: record hello demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Build
+        run: npm run build
+
+      - name: Record demo
+        run: node dist/cli.js run examples/hello.tracecast.yaml --out .tracecast/demo
+
+      - name: Upload run artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tracecast-demo
+          path: .tracecast/demo
+          if-no-files-found: error

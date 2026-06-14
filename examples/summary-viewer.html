@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraceCast Summary Viewer</title>
+    <style>
+      :root {
+        --ok: #166534;
+        --ok-bg: #dcfce7;
+        --fail: #b91c1c;
+        --fail-bg: #fee2e2;
+        --ink: #172033;
+        --muted: #5b6675;
+        --line: #d9e1ec;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, system-ui, Arial, sans-serif;
+        color: var(--ink);
+        background: #f7f9fc;
+      }
+      main { max-width: 860px; margin: 0 auto; padding: 48px 24px; }
+      h1 { font-size: 30px; margin: 0 0 6px; }
+      .sub { color: var(--muted); margin: 0 0 28px; }
+      .drop {
+        border: 2px dashed var(--line);
+        border-radius: 10px;
+        padding: 28px;
+        text-align: center;
+        background: #fff;
+        cursor: pointer;
+      }
+      .drop input { display: none; }
+      .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .badge.ok { color: var(--ok); background: var(--ok-bg); }
+      .badge.failed { color: var(--fail); background: var(--fail-bg); }
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin-top: 20px;
+      }
+      .meta { display: flex; gap: 28px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+      .meta strong { color: var(--ink); }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid #eef2f7; font-size: 14px; }
+      th { color: var(--muted); font-weight: 600; }
+      td.kind { font-family: ui-monospace, Menlo, monospace; }
+      td.dur { text-align: right; color: var(--muted); }
+      .err { color: var(--fail); font-size: 13px; }
+      .artifacts a { display: block; padding: 4px 0; color: #2563eb; word-break: break-all; }
+      .artifacts .akind { color: var(--muted); font-size: 12px; text-transform: uppercase; margin-right: 8px; }
+      footer { margin-top: 32px; color: var(--muted); font-size: 13px; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>TraceCast Summary Viewer</h1>
+      <p class="sub">Load a run's <code>summary.json</code> to inspect steps and artifacts.</p>
+
+      <label class="drop" id="drop">
+        <strong>Choose summary.json</strong> or drag it here
+        <input type="file" id="file" accept="application/json,.json" />
+      </label>
+
+      <div id="output"></div>
+
+      <footer>Built with TraceCast · demo-as-code recordings</footer>
+    </main>
+
+    <script>
+      const output = document.getElementById("output");
+      const fileInput = document.getElementById("file");
+      const drop = document.getElementById("drop");
+
+      function esc(value) {
+        return String(value).replace(/[&<>"']/g, (c) =>
+          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+        );
+      }
+
+      function render(summary) {
+        const statusClass = summary.status === "ok" ? "ok" : "failed";
+        const stepRows = (summary.steps || [])
+          .map((s) => {
+            const badge = s.status === "ok" ? "ok" : "failed";
+            const err = s.error ? `<div class="err">${esc(s.error)}</div>` : "";
+            return `<tr>
+              <td>${s.index}</td>
+              <td class="kind">${esc(s.kind)}</td>
+              <td>${esc(s.target || "")}${err}</td>
+              <td><span class="badge ${badge}">${esc(s.status)}</span></td>
+              <td class="dur">${s.durationMs}ms</td>
+            </tr>`;
+          })
+          .join("");
+
+        const artifacts = (summary.artifacts || [])
+          .map((a) => `<a href="${esc(a.path)}"><span class="akind">${esc(a.kind)}</span>${esc(a.path)}</a>`)
+          .join("");
+
+        const repair = summary.repairContextPath
+          ? `<div class="meta" style="margin-top:10px"><span>Repair context: <strong>${esc(
+              summary.repairContextPath
+            )}</strong></span></div>`
+          : "";
+
+        output.innerHTML = `
+          <div class="card">
+            <span class="badge ${statusClass}">${esc(summary.status)}</span>
+            <div class="meta" style="margin-top:12px">
+              <span>Duration: <strong>${summary.durationMs}ms</strong></span>
+              <span>Steps: <strong>${(summary.steps || []).length}</strong></span>
+              <span>Artifacts: <strong>${(summary.artifacts || []).length}</strong></span>
+            </div>
+            <div class="meta" style="margin-top:6px"><span>Run dir: <strong>${esc(
+              summary.runDir || ""
+            )}</strong></span></div>
+            ${repair}
+          </div>
+          <div class="card">
+            <h3 style="margin:0 0 4px">Steps</h3>
+            <table>
+              <thead><tr><th>#</th><th>Kind</th><th>Target</th><th>Status</th><th>Duration</th></tr></thead>
+              <tbody>${stepRows || '<tr><td colspan="5">No steps.</td></tr>'}</tbody>
+            </table>
+          </div>
+          <div class="card artifacts">
+            <h3 style="margin:0 0 8px">Artifacts</h3>
+            ${artifacts || "<p>No artifacts produced.</p>"}
+          </div>`;
+      }
+
+      function load(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            render(JSON.parse(reader.result));
+          } catch (e) {
+            output.innerHTML = `<div class="card"><span class="badge failed">parse error</span><p>${esc(
+              e.message
+            )}</p></div>`;
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files[0]) load(e.target.files[0]);
+      });
+      drop.addEventListener("dragover", (e) => e.preventDefault());
+      drop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+      });
+
+      // Optional ?summary=<url> auto-load (works when served over http).
+      const url = new URLSearchParams(location.search).get("summary");
+      if (url) {
+        fetch(url)
+          .then((r) => r.json())
+          .then(render)
+          .catch((e) => {
+            output.innerHTML = `<div class="card"><span class="badge failed">load error</span><p>${esc(
+              e.message
+            )}</p></div>`;
+          });
+      }
+    </script>
+  </body>
+</html>

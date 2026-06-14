@@ -1,0 +1,31 @@
+# Terminal-focused demo: show recent git history, then open a local page.
+# The terminal output is rendered into the recording via the embedded panel.
+name: git-log-demo
+
+permissions:
+  terminal: allow
+  browser: allow
+
+recording:
+  viewport:
+    width: 1280
+    height: 720
+  pacing:
+    actionDelayMs: 600
+    typeDelayMs: 60
+  output:
+    format: gif
+    titleCard: "git log, recorded"
+
+steps:
+  - terminal:
+      run: git log --oneline -n 10 --decorate
+
+  - terminal:
+      run: git status --short
+
+  - browser:
+      open: demo-target.html
+
+  - wait:
+      seconds: 2

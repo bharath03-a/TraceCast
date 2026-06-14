@@ -1,0 +1,70 @@
+name: "TraceCast Record"
+description: "Run a TraceCast demo-as-code script in CI and upload the recording."
+author: "TraceCast"
+branding:
+  icon: "video"
+  color: "blue"
+
+inputs:
+  script:
+    description: "Path to the .tracecast.yaml script to run."
+    required: true
+  version:
+    description: "TraceCast npm version/dist-tag to install."
+    required: false
+    default: "latest"
+  out:
+    description: "Output directory for the run (passed to --out)."
+    required: false
+    default: ""
+  upload-artifact:
+    description: "Upload the run directory as a workflow artifact."
+    required: false
+    default: "true"
+  artifact-name:
+    description: "Name for the uploaded artifact."
+    required: false
+    default: "tracecast-run"
+
+outputs:
+  run-dir:
+    description: "The run directory produced by TraceCast."
+    value: ${{ steps.run.outputs.run-dir }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install TraceCast and Chromium
+      shell: bash
+      run: |
+        npm install -g tracecast@${{ inputs.version }}
+        npx playwright install chromium --with-deps
+
+    - name: Run TraceCast script
+      id: run
+      shell: bash
+      env:
+        # Headless Xvfb display for Linux runners.
+        DISPLAY: ":99"
+      run: |
+        set -euo pipefail
+        Xvfb :99 -screen 0 1280x720x24 >/dev/null 2>&1 &
+        OUT_ARG=""
+        if [ -n "${{ inputs.out }}" ]; then
+          OUT_ARG="--out ${{ inputs.out }}"
+        fi
+        tracecast run "${{ inputs.script }}" $OUT_ARG
+        # Resolve the newest run directory and expose it as an output.
+        if [ -n "${{ inputs.out }}" ]; then
+          RUN_DIR="${{ inputs.out }}"
+        else
+          RUN_DIR="$(ls -dt .tracecast/runs/*/ | head -n1)"
+        fi
+        echo "run-dir=${RUN_DIR}" >> "$GITHUB_OUTPUT"
+
+    - name: Upload artifact
+      if: ${{ inputs.upload-artifact == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.run.outputs.run-dir }}

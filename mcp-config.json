@@ -1,0 +1,7 @@
+{
+  "tracecast": {
+    "command": "npx",
+    "args": ["tracecast", "mcp"],
+    "env": {}
+  }
+}

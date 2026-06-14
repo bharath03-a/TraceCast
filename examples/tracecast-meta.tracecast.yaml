@@ -1,0 +1,35 @@
+# TraceCast records itself. Validates and runs the hello demo, then opens the
+# summary viewer. Run from the repo root:  tracecast run examples/tracecast-meta.tracecast.yaml
+name: tracecast-meta
+
+permissions:
+  terminal: allow
+  browser: allow
+
+recording:
+  viewport:
+    width: 1280
+    height: 720
+  cursor:
+    visible: true
+    clickEmphasis: true
+  pacing:
+    actionDelayMs: 700
+    typeDelayMs: 70
+  output:
+    format: gif
+    titleCard: "TraceCast records itself"
+    endCard: "demo-as-code"
+
+steps:
+  - terminal:
+      run: npx tracecast validate examples/hello.tracecast.yaml
+
+  - terminal:
+      run: npx tracecast run examples/hello.tracecast.yaml
+
+  - browser:
+      open: summary-viewer.html
+
+  - wait:
+      seconds: 2

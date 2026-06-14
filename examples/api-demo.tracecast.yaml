@@ -1,0 +1,33 @@
+# API demo: hit a public endpoint from the terminal, then open its docs in the
+# browser. Requires network permission.
+name: api-demo
+
+permissions:
+  terminal: allow
+  browser: allow
+  network: allow
+
+recording:
+  viewport:
+    width: 1280
+    height: 720
+  pacing:
+    actionDelayMs: 700
+    typeDelayMs: 60
+  output:
+    format: gif
+    titleCard: "API demo"
+
+steps:
+  - terminal:
+      run: curl -s https://httpbin.org/get
+
+  - browser:
+      open: https://httpbin.org/
+
+  - assert:
+      text: "httpbin"
+      label: docs-loaded
+
+  - wait:
+      seconds: 2
