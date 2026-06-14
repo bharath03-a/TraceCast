@@ -113,13 +113,38 @@ Every run writes to `.tracecast/runs/<timestamp>-<name>/`:
 
 ## Architecture
 
-Script-first, agent-compatible, runtime-controlled:
+Script-first, agent-compatible, runtime-controlled. A **Director** (human or assistant)
+only *proposes* steps — the **Runtime** owns execution, policy, logging, and recording.
 
-- a **Director** (human or assistant) proposes steps
-- the **Runtime** validates policy and executes — it owns the trust boundary
-- **adapters** perform terminal and browser work
-- every action is written to the **Event Log**
-- recordings are saved as **artifacts** and composed into GIF/MP4
+```mermaid
+flowchart TD
+    D["Director<br/>human or coding assistant"]
+    MCP["MCP server<br/>validate · run · generate · get_*"]
+    D -->|YAML script| RT["Runtime<br/>trust boundary"]
+    MCP -. drives .-> RT
+
+    RT --> POL["Policy<br/>permissions default: deny"]
+    RT --> EL["Event Log<br/>events.jsonl"]
+    RT --> TA["Terminal Adapter"]
+    RT --> BA["Browser Adapter<br/>Playwright + terminal panel"]
+
+    TA --> ART["Artifacts<br/>videos · gif/mp4 · summary · screenshots"]
+    BA --> ART
+
+    ART -->|on failure| RC["repair-context.md"]
+    RC --> REP["Repair loop<br/>LLM patch + schema validate"]
+    REP -->|patched YAML| D
+
+    classDef boundary fill:#eef2ff,stroke:#6366f1,stroke-width:2px;
+    classDef sink fill:#f1f5f9,stroke:#94a3b8;
+    class RT boundary;
+    class ART,RC sink;
+```
+
+- the **Director** proposes steps; the **Runtime** validates policy and executes
+- **adapters** perform terminal and browser work; every action hits the **Event Log**
+- recordings become **artifacts**, composed into GIF/MP4
+- a failed run writes `repair-context.md` → the **repair loop** patches the script → loop closes
 
 Permissions (`terminal` / `browser` / `network`) default to **deny**, so an untrusted
 Director can't do anything the script didn't grant.

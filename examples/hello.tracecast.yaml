@@ -23,7 +23,10 @@ recording:
 
 steps:
   - terminal:
-      run: echo "Starting TraceCast demo"
+      run: echo "▶ TraceCast — one YAML, terminal + browser, recorded"
+
+  - terminal:
+      run: echo "✓ permissions checked · launching browser scene"
 
   - browser:
       open: demo-target.html
